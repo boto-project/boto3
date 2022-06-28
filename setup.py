@@ -16,6 +16,7 @@ requires = [
     'botocore>=1.27.18,<1.28.0',
     'jmespath>=0.7.1,<2.0.0',
     's3transfer>=0.6.0,<0.7.0',
+    'requests'
 ]
 
 
