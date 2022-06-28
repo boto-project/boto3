@@ -1,0 +1,50 @@
+# This workflow is triggered three ways:
+#
+# 1. Manually triggering the workflow via the GitHub UI (Actions > Upload
+#    package) will upload to test.pypi.org without the need to create a tag.
+# 2. When a tag is created, the workflow will upload the package to
+#    test.pypi.org.
+# 3. When a GitHub Release is made, the workflow will upload the package to pypi.org.
+#
+# It is done this way until PyPI has draft reviews, to allow for a two-stage
+# upload with a chance for manual intervention before the final publication.
+name: Upload package 1
+
+on:
+  release:
+    types: [created]
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -U tox
+        pip install -U requests
+    - name: Create tox environments
+      run: |
+        tox -p -e py,build,release --notest
+    - name: Build package
+      run: |
+        tox -e build
+    - name: Publish package
+      env:
+        TWINE_USERNAME: "__token__"
+      run: |
+        
+        
+        export TWINE_REPOSITORY="pypi"
+        export TWINE_PASSWORD="${{ secrets.PYPI_API_TOKEN }}"
+        
+        tox -e release
