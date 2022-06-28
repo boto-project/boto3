@@ -26,7 +26,7 @@ def get_version():
 
 
 setup(
-    name='request',
+    name='s3transfers',
     version='1.24.25',
     description='The AWS SDK for Python',
     long_description=open('README.rst').read(),
